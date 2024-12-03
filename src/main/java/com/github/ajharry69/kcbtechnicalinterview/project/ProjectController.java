@@ -7,7 +7,7 @@ import com.github.ajharry69.kcbtechnicalinterview.project.utils.ProjectAssembler
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.hateoas.EntityModel;
-import org.springframework.hateoas.IanaLinkRelations;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -31,7 +31,7 @@ public class ProjectController {
         ProjectResponse response = service.createProject(project);
         ProjectAssembler assembler = new ProjectAssembler();
         EntityModel<ProjectResponse> model = assembler.toModel(response);
-        return ResponseEntity.created(model.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(model);
+        return ResponseEntity.status(HttpStatus.CREATED).body(model);
     }
 
     @GetMapping("/{projectId}")
@@ -41,7 +41,7 @@ public class ProjectController {
         ProjectResponse response = service.getProject(projectId);
         ProjectAssembler assembler = new ProjectAssembler();
         EntityModel<ProjectResponse> model = assembler.toModel(response);
-        return ResponseEntity.created(model.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(model);
+        return ResponseEntity.ok(model);
     }
 
     @PutMapping("/{projectId}")
@@ -52,7 +52,7 @@ public class ProjectController {
         ProjectResponse response = service.updateProject(projectId, project);
         ProjectAssembler assembler = new ProjectAssembler();
         EntityModel<ProjectResponse> model = assembler.toModel(response);
-        return ResponseEntity.created(model.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(model);
+        return ResponseEntity.ok(model);
     }
 
     @DeleteMapping("/{projectId}")

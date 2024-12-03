@@ -8,7 +8,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.hateoas.EntityModel;
-import org.springframework.hateoas.IanaLinkRelations;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -43,7 +43,7 @@ public class TaskController {
         TaskResponse response = service.createTask(projectId, task);
         TaskAssembler assembler = new TaskAssembler();
         EntityModel<TaskResponse> model = assembler.toModel(response);
-        return ResponseEntity.created(model.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(model);
+        return ResponseEntity.status(HttpStatus.CREATED).body(model);
     }
 
     @GetMapping("/{projectId}/tasks/{taskId}")
@@ -55,7 +55,7 @@ public class TaskController {
         TaskResponse response = service.getTask(projectId, taskId);
         TaskAssembler assembler = new TaskAssembler();
         EntityModel<TaskResponse> model = assembler.toModel(response);
-        return ResponseEntity.created(model.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(model);
+        return ResponseEntity.ok(model);
     }
 
     @PutMapping("/{projectId}/tasks/{taskId}")
@@ -68,7 +68,7 @@ public class TaskController {
         TaskResponse response = service.updateTask(projectId, taskId, task);
         TaskAssembler assembler = new TaskAssembler();
         EntityModel<TaskResponse> model = assembler.toModel(response);
-        return ResponseEntity.created(model.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(model);
+        return ResponseEntity.ok(model);
     }
 
     @DeleteMapping("/{projectId}/tasks/{taskId}")
