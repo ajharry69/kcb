@@ -1,11 +1,9 @@
 package com.github.ajharry69.kcbtechnicalinterview.task;
 
+import com.github.ajharry69.kcbtechnicalinterview.project.models.Project;
 import com.github.ajharry69.kcbtechnicalinterview.task.models.Task;
 import com.github.ajharry69.kcbtechnicalinterview.task.models.TaskStatus;
-import jakarta.persistence.criteria.CriteriaBuilder;
-import jakarta.persistence.criteria.CriteriaQuery;
-import jakarta.persistence.criteria.Predicate;
-import jakarta.persistence.criteria.Root;
+import jakarta.persistence.criteria.*;
 import lombok.AllArgsConstructor;
 import org.springframework.data.jpa.domain.Specification;
 
@@ -23,7 +21,8 @@ public class TaskSpecification implements Specification<Task> {
     @Override
     public Predicate toPredicate(Root<Task> root, CriteriaQuery<?> query, CriteriaBuilder criteriaBuilder) {
         List<Predicate> predicates = new ArrayList<>();
-        predicates.add(criteriaBuilder.equal(root.get("projectId"), projectId));
+        Join<Project, Task> projectJoin = root.join("project");
+        predicates.add(criteriaBuilder.equal(projectJoin.get("id"), projectId));
         if (status != null) {
             predicates.add(criteriaBuilder.equal(root.get("status"), status));
         }

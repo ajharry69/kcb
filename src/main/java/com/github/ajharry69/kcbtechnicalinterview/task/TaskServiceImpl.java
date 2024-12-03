@@ -36,6 +36,7 @@ public class TaskServiceImpl implements TaskService {
                 .map(task -> TaskResponse.builder()
                         .id(task.getId())
                         .name(task.getName())
+                        .dueDate(task.getDueDate())
                         .status(task.getStatus())
                         .build())
                 .toList();
@@ -52,6 +53,7 @@ public class TaskServiceImpl implements TaskService {
         Task entity = Task.builder()
                 .name(task.name())
                 .status(task.status())
+                .dueDate(task.dueDate())
                 .project(project)
                 .build();
         Task saveTask = repository.save(entity);
@@ -92,6 +94,7 @@ public class TaskServiceImpl implements TaskService {
         Task entity = Task.builder()
                 .name(task.name())
                 .status(task.status())
+                .dueDate(task.dueDate())
                 .build();
         Task saveTask = repository.save(entity);
         return TaskResponse.builder()

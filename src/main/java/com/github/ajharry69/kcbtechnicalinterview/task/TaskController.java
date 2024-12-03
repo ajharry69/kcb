@@ -29,9 +29,9 @@ public class TaskController {
             @RequestParam(required = false)
             TaskStatus status,
             @RequestParam(required = false)
-            LocalDate startDate,
+            LocalDate dueDate,
             Pageable pageable) {
-        List<TaskResponse> tasks = service.getTasks(projectId, status, startDate, pageable);
+        List<TaskResponse> tasks = service.getTasks(projectId, status, dueDate, pageable);
         return ResponseEntity.ok(tasks);
     }
 
