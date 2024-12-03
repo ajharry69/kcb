@@ -5,12 +5,18 @@ import com.github.ajharry69.kcbtechnicalinterview.project.exceptions.ProjectNotF
 import com.github.ajharry69.kcbtechnicalinterview.project.models.Project;
 import com.github.ajharry69.kcbtechnicalinterview.project.models.ProjectRequest;
 import com.github.ajharry69.kcbtechnicalinterview.project.models.ProjectResponse;
+import com.github.ajharry69.kcbtechnicalinterview.project.models.ProjectSummaryResponse;
+import com.github.ajharry69.kcbtechnicalinterview.task.models.Task;
+import com.github.ajharry69.kcbtechnicalinterview.task.models.TaskStatus;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
@@ -86,5 +92,24 @@ public class ProjectServiceImpl implements ProjectService {
         }
 
         repository.deleteById(projectId);
+    }
+
+    @Override
+    public List<ProjectSummaryResponse> getProjectSummary() {
+        List<Project> projects = repository.findAll();
+        List<ProjectSummaryResponse> summaries = new ArrayList<>();
+
+        for (Project project : projects) {
+            Map<TaskStatus, Long> taskCountByStatus = project.getTasks().stream()
+                    .collect(Collectors.groupingBy(Task::getStatus, Collectors.counting()));
+
+            ProjectSummaryResponse response = new ProjectSummaryResponse();
+            response.setProjectId(project.getId());
+            response.setProjectName(project.getName());
+            response.setTaskCountByStatus(taskCountByStatus);
+            summaries.add(response);
+        }
+
+        return summaries;
     }
 }

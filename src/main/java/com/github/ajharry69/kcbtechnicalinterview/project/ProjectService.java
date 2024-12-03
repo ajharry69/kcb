@@ -2,6 +2,7 @@ package com.github.ajharry69.kcbtechnicalinterview.project;
 
 import com.github.ajharry69.kcbtechnicalinterview.project.models.ProjectRequest;
 import com.github.ajharry69.kcbtechnicalinterview.project.models.ProjectResponse;
+import com.github.ajharry69.kcbtechnicalinterview.project.models.ProjectSummaryResponse;
 
 import java.util.List;
 import java.util.UUID;
@@ -16,4 +17,6 @@ public interface ProjectService {
     ProjectResponse updateProject(UUID projectId, ProjectRequest project);
 
     void deleteProject(UUID projectId);
+
+    List<ProjectSummaryResponse> getProjectSummary();
 }

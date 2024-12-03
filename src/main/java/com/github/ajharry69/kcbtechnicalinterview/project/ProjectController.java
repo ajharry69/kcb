@@ -2,6 +2,7 @@ package com.github.ajharry69.kcbtechnicalinterview.project;
 
 import com.github.ajharry69.kcbtechnicalinterview.project.models.ProjectRequest;
 import com.github.ajharry69.kcbtechnicalinterview.project.models.ProjectResponse;
+import com.github.ajharry69.kcbtechnicalinterview.project.models.ProjectSummaryResponse;
 import com.github.ajharry69.kcbtechnicalinterview.project.utils.ProjectAssembler;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -60,5 +61,11 @@ public class ProjectController {
             UUID projectId) {
         service.deleteProject(projectId);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/summary")
+    public ResponseEntity<List<ProjectSummaryResponse>> getProjectSummary() {
+        List<ProjectSummaryResponse> summary = service.getProjectSummary();
+        return ResponseEntity.ok(summary);
     }
 }
