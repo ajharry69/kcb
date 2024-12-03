@@ -1,1 +1,6 @@
 services:
+  app:
+    build:
+      context: .
+    ports:
+      - "${PORT:-8080}:8080"

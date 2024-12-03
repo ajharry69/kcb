@@ -1,14 +1,13 @@
 package com.github.ajharry69.kcbtechnicalinterview.project.models;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import com.github.ajharry69.kcbtechnicalinterview.task.models.Task;
+import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.List;
 import java.util.UUID;
 
-@Entity
+@Entity(name = "projects")
 @Builder
 @Getter
 @Setter
@@ -20,4 +19,6 @@ public class Project {
     private UUID id;
     private String name;
     private String description;
+    @OneToMany(mappedBy = "project")
+    private List<Task> tasks;
 }
