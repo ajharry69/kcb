@@ -5,7 +5,6 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
-import java.util.Date;
 import java.util.UUID;
 
 @Entity
@@ -20,7 +19,7 @@ public class Task {
     private UUID id;
     private String name;
     @Enumerated(EnumType.STRING)
-    private TaskStatus status = TaskStatus.TO_DO;
+    private TaskStatus status;
     @Column(nullable = false)
     private LocalDate dueDate;
     @ManyToOne

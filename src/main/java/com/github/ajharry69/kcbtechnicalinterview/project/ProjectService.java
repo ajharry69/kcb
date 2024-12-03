@@ -12,6 +12,7 @@ public interface ProjectService {
     ProjectResponse createProject(ProjectRequest project);
 
     ProjectResponse getProject(UUID projectId);
+
     ProjectResponse updateProject(UUID projectId, ProjectRequest project);
 
     void deleteProject(UUID projectId);

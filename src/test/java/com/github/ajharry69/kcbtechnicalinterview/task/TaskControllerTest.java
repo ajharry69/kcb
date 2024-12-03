@@ -20,16 +20,8 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-//@RunWith(SpringJUnit4ClassRunner.class)
-//@ContextConfiguration(classes = MyConfiguration.class)
 @WebAppConfiguration
-//@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class TaskControllerTest {
-    /*@Before
-    public void setup() {
-        RestAssured.port = RestAssured.DEFAULT_PORT;
-    }*/
-
     @Nested
     class CreateTask {
         @Test

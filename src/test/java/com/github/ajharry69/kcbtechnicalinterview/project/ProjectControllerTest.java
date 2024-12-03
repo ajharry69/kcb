@@ -16,16 +16,8 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-//@RunWith(SpringJUnit4ClassRunner.class)
-//@ContextConfiguration(classes = MyConfiguration.class)
 @WebAppConfiguration
-//@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class ProjectControllerTest {
-    /*@Before
-    public void setup() {
-        RestAssured.port = RestAssured.DEFAULT_PORT;
-    }*/
-
     @Nested
     class CreateProject {
         @Test
@@ -72,7 +64,6 @@ class ProjectControllerTest {
                     .thenReturn(List.of(ProjectResponse.builder().id(UUID.randomUUID()).name("Example").build()));
             given()
                     .standaloneSetup(new ProjectController(service))
-//                    .param("name", "Johan")
                     .when()
                     .get("/projects")
                     .then()

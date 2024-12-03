@@ -11,7 +11,6 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 
@@ -89,7 +88,7 @@ class TaskServiceImplTest {
             var service = new TaskServiceImpl(repository, projectRepository);
 
             // When
-            assertThatThrownBy(() -> service.getTask(UUID.randomUUID(),UUID.randomUUID()))
+            assertThatThrownBy(() -> service.getTask(UUID.randomUUID(), UUID.randomUUID()))
                     .isInstanceOf(TaskNotFoundException.class);
         }
 
@@ -105,7 +104,7 @@ class TaskServiceImplTest {
             var service = new TaskServiceImpl(repository, projectRepository);
 
             // When
-            TaskResponse task = service.getTask(UUID.randomUUID(),UUID.randomUUID());
+            TaskResponse task = service.getTask(UUID.randomUUID(), UUID.randomUUID());
 
             // Then
             assertThat(task)
@@ -129,7 +128,7 @@ class TaskServiceImplTest {
             // When
             assertAll(
                     () -> verify(repository, never()).save(any()),
-                    () -> assertThatThrownBy(() -> service.deleteTask(UUID.randomUUID(),UUID.randomUUID()))
+                    () -> assertThatThrownBy(() -> service.deleteTask(UUID.randomUUID(), UUID.randomUUID()))
                             .isInstanceOf(TaskNotFoundException.class)
             );
         }
@@ -147,7 +146,7 @@ class TaskServiceImplTest {
 
             // When
             UUID taskId = UUID.randomUUID();
-            service.deleteTask(UUID.randomUUID(),taskId);
+            service.deleteTask(UUID.randomUUID(), taskId);
 
             // Then
             var argumentCaptor = ArgumentCaptor.forClass(UUID.class);
@@ -175,7 +174,7 @@ class TaskServiceImplTest {
             // When
             assertAll(
                     () -> verify(repository, never()).save(any()),
-                    () -> assertThatThrownBy(() -> service.updateTask(UUID.randomUUID(),UUID.randomUUID(), TaskRequest.builder().name("example").build()))
+                    () -> assertThatThrownBy(() -> service.updateTask(UUID.randomUUID(), UUID.randomUUID(), TaskRequest.builder().name("example").build()))
                             .isInstanceOf(TaskNotFoundException.class)
             );
         }
@@ -196,7 +195,7 @@ class TaskServiceImplTest {
             var service = new TaskServiceImpl(repository, projectRepository);
 
             // When
-            var actual = service.updateTask(UUID.randomUUID(),UUID.randomUUID(), TaskRequest.builder().name("example").build());
+            var actual = service.updateTask(UUID.randomUUID(), UUID.randomUUID(), TaskRequest.builder().name("example").build());
 
             // Then
             assertAll(
@@ -232,7 +231,7 @@ class TaskServiceImplTest {
             // When
             assertAll(
                     () -> verify(repository, never()).save(any()),
-                    () -> assertThatThrownBy(() -> service.createTask(UUID.randomUUID(),TaskRequest.builder().name("example").build()))
+                    () -> assertThatThrownBy(() -> service.createTask(UUID.randomUUID(), TaskRequest.builder().name("example").build()))
                             .isInstanceOf(DuplicateTaskException.class)
             );
         }
@@ -251,7 +250,7 @@ class TaskServiceImplTest {
             var service = new TaskServiceImpl(repository, projectRepository);
 
             // When
-            var actual = service.createTask(UUID.randomUUID(),TaskRequest.builder().name("example").build());
+            var actual = service.createTask(UUID.randomUUID(), TaskRequest.builder().name("example").build());
 
             // Then
             assertAll(

@@ -3,7 +3,7 @@ CREATE TABLE IF NOT EXISTS projects
 (
     id          UUID PRIMARY KEY,
     name        VARCHAR(50) NOT NULL,
-    description VARCHAR(100)     DEFAULT NULL
+    description VARCHAR(100) DEFAULT NULL
 );
 
 CREATE TABLE IF NOT EXISTS tasks
