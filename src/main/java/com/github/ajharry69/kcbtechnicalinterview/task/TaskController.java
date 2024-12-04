@@ -6,14 +6,16 @@ import com.github.ajharry69.kcbtechnicalinterview.task.models.TaskStatus;
 import com.github.ajharry69.kcbtechnicalinterview.task.utils.TaskAssembler;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.PagedModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
-import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -21,9 +23,10 @@ import java.util.UUID;
 @RequestMapping("/projects")
 public class TaskController {
     private final TaskService service;
+    private final PagedResourcesAssembler<TaskResponse> taskPageAssembler;
 
     @GetMapping("/{projectId}/tasks")
-    public ResponseEntity<List<TaskResponse>> getTasks(
+    public PagedModel<EntityModel<TaskResponse>> getTasks(
             @PathVariable
             UUID projectId,
             @RequestParam(required = false)
@@ -31,8 +34,11 @@ public class TaskController {
             @RequestParam(required = false)
             LocalDate dueDate,
             Pageable pageable) {
-        List<TaskResponse> tasks = service.getTasks(projectId, status, dueDate, pageable);
-        return ResponseEntity.ok(tasks);
+        Page<TaskResponse> tasks = service.getTasks(projectId, status, dueDate, pageable);
+        return taskPageAssembler.toModel(
+                tasks,
+                new TaskAssembler()
+        );
     }
 
     @PostMapping("/{projectId}/tasks")

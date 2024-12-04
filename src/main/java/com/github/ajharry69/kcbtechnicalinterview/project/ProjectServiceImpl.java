@@ -9,6 +9,8 @@ import com.github.ajharry69.kcbtechnicalinterview.project.models.ProjectSummaryR
 import com.github.ajharry69.kcbtechnicalinterview.task.models.Task;
 import com.github.ajharry69.kcbtechnicalinterview.task.models.TaskStatus;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,15 +26,13 @@ public class ProjectServiceImpl implements ProjectService {
     private final ProjectRepository repository;
 
     @Override
-    public List<ProjectResponse> getProjects() {
-        return repository.findAll()
-                .stream()
+    public Page<ProjectResponse> getProjects(Pageable pageable) {
+        return repository.findAll(pageable)
                 .map(project -> ProjectResponse.builder()
                         .id(project.getId())
                         .name(project.getName())
                         .description(project.getDescription())
-                        .build())
-                .toList();
+                        .build());
     }
 
     @Override

@@ -9,6 +9,8 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 
 import java.util.Collections;
 import java.util.List;
@@ -30,15 +32,18 @@ class ProjectServiceImplTest {
         @Test
         void shouldReturnEmpty_WhenProjectsAreNotAvailable() {
             // Given
-            var repository = mock(ProjectRepository.class);
+            final var repository = mock(ProjectRepository.class);
+            when(repository.findAll(any(Pageable.class)))
+                    .thenReturn(new PageImpl<>(Collections.emptyList()));
             var service = new ProjectServiceImpl(repository);
 
             // When
-            var actual = service.getProjects();
+            var actual = service.getProjects(Pageable.unpaged());
 
             // Then
             assertAll(
-                    () -> verify(repository, times(1)).findAll(),
+                    () -> verify(repository, times(1))
+                            .findAll(any(Pageable.class)),
                     () -> assertIterableEquals(Collections.emptyList(), actual)
             );
         }
@@ -47,16 +52,17 @@ class ProjectServiceImplTest {
         void shouldReturnNonEmpty_WhenProjectsAreAvailable() {
             // Given
             var repository = mock(ProjectRepository.class);
-            when(repository.findAll())
-                    .thenReturn(List.of(Project.builder().build()));
+            when(repository.findAll(any(Pageable.class)))
+                    .thenReturn(new PageImpl<>(List.of(Project.builder().build())));
             var service = new ProjectServiceImpl(repository);
 
             // When
-            var actual = service.getProjects();
+            var actual = service.getProjects(Pageable.unpaged());
 
             // Then
             assertAll(
-                    () -> verify(repository, times(1)).findAll(),
+                    () -> verify(repository, times(1))
+                            .findAll(any(Pageable.class)),
                     () -> Assertions.assertThat(actual)
                             .isNotEmpty()
             );

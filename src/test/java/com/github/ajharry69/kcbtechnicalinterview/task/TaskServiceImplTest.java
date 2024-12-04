@@ -11,6 +11,7 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 
@@ -35,18 +36,28 @@ class TaskServiceImplTest {
         void shouldReturnEmpty_WhenTasksAreNotAvailable() {
             // Given
             var repository = mock(TaskRepository.class);
+            when(repository.findAll(any(TaskSpecification.class), any(Pageable.class)))
+                    .thenReturn(new PageImpl<>(Collections.emptyList()));
+
             var projectRepository = mock(ProjectRepository.class);
             when(projectRepository.findById(any()))
                     .thenReturn(Optional.of(Project.builder().build()));
+
             var service = new TaskServiceImpl(repository, projectRepository);
 
             // When
-            var actual = service.getTasks(UUID.randomUUID(), null, null, Pageable.unpaged());
+            var actual = service.getTasks(
+                    UUID.randomUUID(),
+                    null,
+                    null,
+                    Pageable.unpaged()
+            );
 
             // Then
             assertAll(
-                    () -> verify(repository, times(1)).findAll(),
-                    () -> assertIterableEquals(Collections.emptyList(), actual)
+                    () -> verify(repository, times(1))
+                            .findAll(any(TaskSpecification.class), any(Pageable.class)),
+                    () -> assertIterableEquals(Page.empty(), actual)
             );
         }
 
@@ -54,8 +65,7 @@ class TaskServiceImplTest {
         void shouldReturnNonEmpty_WhenTasksAreAvailable() {
             // Given
             var repository = mock(TaskRepository.class);
-            var specification = mock(TaskSpecification.class);
-            when(repository.findAll(specification, any(Pageable.class)))
+            when(repository.findAll(any(TaskSpecification.class), any(Pageable.class)))
                     .thenReturn(new PageImpl<>(List.of(Task.builder().build())));
             var projectRepository = mock(ProjectRepository.class);
             when(projectRepository.findById(any()))
@@ -67,7 +77,8 @@ class TaskServiceImplTest {
 
             // Then
             assertAll(
-                    () -> verify(repository, times(1)).findAll(),
+                    () -> verify(repository, times(1))
+                            .findAll(any(TaskSpecification.class), any(Pageable.class)),
                     () -> Assertions.assertThat(actual)
                             .isNotEmpty()
             );

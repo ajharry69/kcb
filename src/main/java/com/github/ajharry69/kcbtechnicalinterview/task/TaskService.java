@@ -3,6 +3,7 @@ package com.github.ajharry69.kcbtechnicalinterview.task;
 import com.github.ajharry69.kcbtechnicalinterview.task.models.TaskRequest;
 import com.github.ajharry69.kcbtechnicalinterview.task.models.TaskResponse;
 import com.github.ajharry69.kcbtechnicalinterview.task.models.TaskStatus;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import java.time.LocalDate;
@@ -10,7 +11,7 @@ import java.util.List;
 import java.util.UUID;
 
 public interface TaskService {
-    List<TaskResponse> getTasks(UUID projectId,
+    Page<TaskResponse> getTasks(UUID projectId,
                                 TaskStatus status,
                                 LocalDate dueDate,
                                 Pageable pageable);

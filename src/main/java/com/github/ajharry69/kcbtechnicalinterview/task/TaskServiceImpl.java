@@ -10,12 +10,12 @@ import com.github.ajharry69.kcbtechnicalinterview.task.models.TaskRequest;
 import com.github.ajharry69.kcbtechnicalinterview.task.models.TaskResponse;
 import com.github.ajharry69.kcbtechnicalinterview.task.models.TaskStatus;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.util.List;
 import java.util.UUID;
 
 @RequiredArgsConstructor
@@ -25,21 +25,19 @@ public class TaskServiceImpl implements TaskService {
     private final ProjectRepository projectRepository;
 
     @Override
-    public List<TaskResponse> getTasks(UUID projectId,
+    public Page<TaskResponse> getTasks(UUID projectId,
                                        TaskStatus status,
                                        LocalDate dueDate,
                                        Pageable pageable) {
         Project project = getProjectByIdOrThrow(projectId);
         TaskSpecification specification = new TaskSpecification(project.getId(), status, dueDate);
-        return repository.findAll(specification)
-                .stream()
+        return repository.findAll(specification, pageable)
                 .map(task -> TaskResponse.builder()
                         .id(task.getId())
                         .name(task.getName())
                         .dueDate(task.getDueDate())
                         .status(task.getStatus())
-                        .build())
-                .toList();
+                        .build());
     }
 
     @Override
