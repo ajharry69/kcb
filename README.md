@@ -1,12 +1,10 @@
-# Run
-
-## Server
+## Start the server
 `docker compose up --build`
 
-### API Doc
+### Test the APIs
 
 Go to: http://localhost:8080/swagger-ui/index.html
 
-## Tests
+## Run the tests
 
 `mvn clean test`
