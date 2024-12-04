@@ -1,47 +1,55 @@
 package com.github.ajharry69.kcbtechnicalinterview.task;
 
+import com.github.ajharry69.kcbtechnicalinterview.project.ProjectRepository;
+import com.github.ajharry69.kcbtechnicalinterview.project.models.Project;
+import com.github.ajharry69.kcbtechnicalinterview.task.models.Task;
 import com.github.ajharry69.kcbtechnicalinterview.task.models.TaskRequest;
-import com.github.ajharry69.kcbtechnicalinterview.task.models.TaskResponse;
-import com.github.ajharry69.kcbtechnicalinterview.task.models.TaskStatus;
-import io.restassured.module.mockmvc.response.MockMvcResponse;
+import io.restassured.RestAssured;
+import io.restassured.http.ContentType;
+import io.restassured.response.Response;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.web.HateoasPageableHandlerMethodArgumentResolver;
-import org.springframework.data.web.PagedResourcesAssembler;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
-import org.springframework.test.context.web.WebAppConfiguration;
-import org.springframework.web.util.UriComponents;
 
 import java.time.LocalDate;
-import java.util.List;
-import java.util.UUID;
 
-import static io.restassured.module.mockmvc.RestAssuredMockMvc.given;
+import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.equalTo;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
-@WebAppConfiguration
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class TaskControllerTest {
+    private Project project;
+
+    @Autowired
+    private ProjectRepository projectRepository;
+    @Autowired
+    private TaskRepository taskRepository;
+
+    @BeforeEach
+    public void setUp() {
+        RestAssured.port = RestAssured.DEFAULT_PORT;
+
+        projectRepository.deleteAll();
+        taskRepository.deleteAll();
+
+        project = projectRepository.save(
+                Project.builder()
+                        .name("Example")
+                        .build()
+        );
+    }
+
     @Nested
     class CreateTask {
         @Test
         void shouldCreateTask() {
-            TaskService service = mock(TaskService.class);
-            HateoasPageableHandlerMethodArgumentResolver pageableHandlerMethodArgumentResolver = mock(HateoasPageableHandlerMethodArgumentResolver.class);
-            UriComponents uriComponents = mock(UriComponents.class);
-            PagedResourcesAssembler<TaskResponse> pagedResourcesAssembler = new PagedResourcesAssembler<>(
-                    pageableHandlerMethodArgumentResolver,
-                    uriComponents
-            );
-
-            MockMvcResponse response = given()
-                    .standaloneSetup(new TaskController(service, pagedResourcesAssembler))
+            Response response = given()
+                    .contentType(ContentType.JSON)
                     .body(TaskRequest.builder().name("Example").build())
-                    .when()
-                    .post("/projects/{projectId}/tasks", UUID.randomUUID());
+                    .post("/api/v1/projects/{projectId}/tasks", project.getId());
 
             response.prettyPrint();
 
@@ -52,19 +60,10 @@ class TaskControllerTest {
 
         @Test
         void shouldReturnBadRequestForInvalidTask() {
-            TaskService service = mock(TaskService.class);
-            HateoasPageableHandlerMethodArgumentResolver pageableHandlerMethodArgumentResolver = mock(HateoasPageableHandlerMethodArgumentResolver.class);
-            UriComponents uriComponents = mock(UriComponents.class);
-            PagedResourcesAssembler<TaskResponse> pagedResourcesAssembler = new PagedResourcesAssembler<>(
-                    pageableHandlerMethodArgumentResolver,
-                    uriComponents
-            );
-
-            MockMvcResponse response = given()
-                    .standaloneSetup(new TaskController(service, pagedResourcesAssembler))
+            Response response = given()
+                    .contentType(ContentType.JSON)
                     .body(TaskRequest.builder().build())
-                    .when()
-                    .post("/projects/{projectId}/tasks", UUID.randomUUID());
+                    .post("/api/v1/projects/{projectId}/tasks", project.getId());
 
             response.prettyPrint();
 
@@ -78,25 +77,23 @@ class TaskControllerTest {
     class GetTasks {
         @Test
         void shouldReturnTasks() {
-            var projectId = UUID.randomUUID();
-            TaskService service = mock(TaskService.class);
-            when(service.getTasks(projectId, TaskStatus.TO_DO, LocalDate.now(), Pageable.ofSize(20)))
-                    .thenReturn(new PageImpl<>(List.of(TaskResponse.builder().id(UUID.randomUUID()).name("Example").build())));
-            HateoasPageableHandlerMethodArgumentResolver pageableHandlerMethodArgumentResolver = mock(HateoasPageableHandlerMethodArgumentResolver.class);
-            UriComponents uriComponents = mock(UriComponents.class);
-            PagedResourcesAssembler<TaskResponse> pagedResourcesAssembler = new PagedResourcesAssembler<>(
-                    pageableHandlerMethodArgumentResolver,
-                    uriComponents
+            taskRepository.save(
+                    Task.builder().name("Example")
+                            .dueDate(LocalDate.now().plusDays(1))
+                            .project(project).build()
             );
 
-            given()
-                    .standaloneSetup(new TaskController(service, pagedResourcesAssembler))
+            Response response = given()
 //                    .param("name", "Johan")
                     .when()
-                    .get("/projects/{projectId}/tasks", projectId)
+                    .get("/api/v1/projects/{projectId}/tasks", project.getId());
+
+            response.prettyPrint();
+
+            response
                     .then()
                     .statusCode(HttpStatus.OK.value())
-                    .body("size()", equalTo(1));
+                    .body("page.totalElements", equalTo(1));
         }
     }
 }

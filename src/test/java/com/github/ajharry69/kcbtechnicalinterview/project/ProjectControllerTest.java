@@ -1,69 +1,55 @@
 package com.github.ajharry69.kcbtechnicalinterview.project;
 
+import com.github.ajharry69.kcbtechnicalinterview.project.models.Project;
 import com.github.ajharry69.kcbtechnicalinterview.project.models.ProjectRequest;
-import com.github.ajharry69.kcbtechnicalinterview.project.models.ProjectResponse;
-import io.restassured.module.mockmvc.response.MockMvcResponse;
+import io.restassured.RestAssured;
+import io.restassured.http.ContentType;
+import io.restassured.response.Response;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.web.HateoasPageableHandlerMethodArgumentResolver;
-import org.springframework.data.web.PagedResourcesAssembler;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
-import org.springframework.test.context.web.WebAppConfiguration;
-import org.springframework.web.util.UriComponents;
 
-import java.util.List;
-import java.util.UUID;
-
-import static io.restassured.module.mockmvc.RestAssuredMockMvc.given;
+import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.equalTo;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
-@WebAppConfiguration
+
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 class ProjectControllerTest {
+    @Autowired
+    private ProjectRepository repository;
+
+    @BeforeEach
+    public void setUp() {
+        RestAssured.port = RestAssured.DEFAULT_PORT;
+
+        repository.deleteAll();
+    }
+
     @Nested
     class CreateProject {
         @Test
         void shouldCreateProject() {
-            ProjectService service = mock(ProjectService.class);
-            HateoasPageableHandlerMethodArgumentResolver pageableHandlerMethodArgumentResolver = mock(HateoasPageableHandlerMethodArgumentResolver.class);
-            UriComponents uriComponents = mock(UriComponents.class);
-            PagedResourcesAssembler<ProjectResponse> pagedResourcesAssembler = new PagedResourcesAssembler<>(
-                    pageableHandlerMethodArgumentResolver,
-                    uriComponents
-            );
-
-            MockMvcResponse response = given()
-                    .standaloneSetup(new ProjectController(service, pagedResourcesAssembler))
+            Response response = given()
+                    .contentType(ContentType.JSON)
                     .body(ProjectRequest.builder().name("Example").build())
-                    .when()
-                    .post("/projects");
+                    .post("/api/v1/projects");
 
             response.prettyPrint();
 
             response
                     .then()
-                    .statusCode(HttpStatus.BAD_REQUEST.value());
+                    .statusCode(HttpStatus.CREATED.value());
         }
 
         @Test
         void shouldReturnBadRequestForInvalidProject() {
-            ProjectService service = mock(ProjectService.class);
-            HateoasPageableHandlerMethodArgumentResolver pageableHandlerMethodArgumentResolver = mock(HateoasPageableHandlerMethodArgumentResolver.class);
-            UriComponents uriComponents = mock(UriComponents.class);
-            PagedResourcesAssembler<ProjectResponse> pagedResourcesAssembler = new PagedResourcesAssembler<>(
-                    pageableHandlerMethodArgumentResolver,
-                    uriComponents
-            );
-
-            MockMvcResponse response = given()
-                    .standaloneSetup(new ProjectController(service, pagedResourcesAssembler))
+            Response response = given()
+                    .contentType(ContentType.JSON)
                     .body(ProjectRequest.builder().build())
-                    .when()
-                    .post("/projects");
+                    .post("/api/v1/projects");
 
             response.prettyPrint();
 
@@ -77,23 +63,18 @@ class ProjectControllerTest {
     class GetProjects {
         @Test
         void shouldReturnProjects() {
-            ProjectService service = mock(ProjectService.class);
-            when(service.getProjects(any()))
-                    .thenReturn(new PageImpl<>(List.of(ProjectResponse.builder().id(UUID.randomUUID()).name("Example").build())));
-            HateoasPageableHandlerMethodArgumentResolver pageableHandlerMethodArgumentResolver = mock(HateoasPageableHandlerMethodArgumentResolver.class);
-            UriComponents uriComponents = mock(UriComponents.class);
-            PagedResourcesAssembler<ProjectResponse> pagedResourcesAssembler = new PagedResourcesAssembler<>(
-                    pageableHandlerMethodArgumentResolver,
-                    uriComponents
-            );
+            repository.save(Project.builder().name("Example").build());
 
-            given()
-                    .standaloneSetup(new ProjectController(service, pagedResourcesAssembler))
+            Response response = given()
                     .when()
-                    .get("/projects")
+                    .get("/api/v1/projects");
+
+            response.prettyPrint();
+
+            response
                     .then()
                     .statusCode(HttpStatus.OK.value())
-                    .body("size()", equalTo(1));
+                    .body("page.totalElements", equalTo(1));
         }
     }
 }

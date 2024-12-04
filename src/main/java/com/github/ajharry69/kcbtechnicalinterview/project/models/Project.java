@@ -19,6 +19,6 @@ public class Project {
     private UUID id;
     private String name;
     private String description;
-    @OneToMany(mappedBy = "project")
+    @OneToMany(mappedBy = "project", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Task> tasks;
 }
